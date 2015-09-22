@@ -1,0 +1,22 @@
+{
+  "name": "Fast-Contacts",
+  "description": "Fast contacts list",
+  "launch_path": "/index.html",
+  "type": "privileged",
+  "developer": {
+    "name": "Francisco Jordano"
+  },
+  "permissions": {
+    "contacts":{
+      "description": "Contacts permissions is required",
+      "access": "readwrite"
+    }
+  },
+  "default_locale": "en-US",
+  "icons": {
+    "60": "/style/icons/icon.png",
+    "120": "/style/icons/icon.png",
+    "128": "/style/icons/icon.png"
+  },
+  "version": "1.0.0"
+}

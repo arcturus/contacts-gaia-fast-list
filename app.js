@@ -21,6 +21,13 @@
     getItemImageSrc: getImage
   });
 
+  list.addEventListener('click', evt => {
+    var li = evt.target.closest('li');
+    var contactId = li.dataset.id;
+
+    console.log('Contact id: ' + contactId);
+  });
+
   function getImage(data, index) {
     if (typeof data.image === 'string') {
       return data.image;
@@ -112,6 +119,7 @@
       var contact = evt.target.result;
       if (contact) {
         var row = {
+          id: contact.id,
           title: getRowTitle(contact) || 'No name',
           org: getOrg(contact),
           background: colors[index % colors.length]
@@ -119,7 +127,6 @@
         index++;
         row.initials = getInitials(row.title);
         if (Array.isArray(contact.photo) && contact.photo.length > 0) {
-          console.log('------> we have image ' + contact.photo);
           row.image = contact.photo[contact.photo.length > 1 ? 1: 0];
         } else {
           console.log('-----> no image for us');

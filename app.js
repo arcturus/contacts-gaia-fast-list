@@ -23,6 +23,9 @@
 
   list.addEventListener('click', evt => {
     var li = evt.target.closest('li');
+    if (!li) {
+      return;
+    }
     var contactId = li.dataset.id;
 
     console.log('Contact id: ' + contactId);

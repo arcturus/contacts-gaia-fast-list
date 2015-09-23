@@ -22,7 +22,7 @@
   ],
   "dependencies": {
     "base": "gaia-components/base",
-    "gaia-fast-list": "https://github.com/wilsonpage/gaia-fast-list.git#7-images",
+    "gaia-fast-list": "gaia-components/gaia-fast-list",
     "gaia-fonts": "gaia-components/gaia-fonts#~0.2.1",
     "gaia-header": "gaia-components/gaia-header#~0.8.4",
     "gaia-theme": "gaia-components/gaia-theme#~0.5.1"

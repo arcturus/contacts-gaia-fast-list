@@ -217,16 +217,12 @@ var GaiaFastListProto = {
       :host {
         display: block;
         height: 100%;
-        overflow: hidden;
-        color: var(--text-color);
+
+        color: var(--text-color-minus);
       }
 
       .inner {
-        position: relative;
-
         height: 100%;
-        overflow: hidden;
-        -moz-user-select: none;
       }
 
       .fast-list {
@@ -248,12 +244,7 @@ var GaiaFastListProto = {
       }
 
       .fast-list.empty {
-        background: repeating-linear-gradient(
-          0deg,
-          var(--background) 0px,
-          var(--background) 59px,
-          var(--border-color) 60px,
-          var(--border-color) 60px);
+
         background-position: 0 1px;
       }
 
@@ -272,9 +263,6 @@ var GaiaFastListProto = {
         z-index: 100;
 
         display: block;
-
-        background: var(--background-plus);
-        color: var(--title-color);
       }
 
       ::content .gfl-section {
@@ -300,15 +288,15 @@ var GaiaFastListProto = {
       ::content .gfl-item {
         z-index: 10;
 
-        box-sizing: border-box;
         display: flex;
+        flex-direction: column;
+        justify-content: center;
+        box-sizing: border-box;
         width: 100%;
         height: 60px;
-        padding: 9px 0;
-        align-items: center;
+        padding: 0 9px;
 
         list-style-type: none;
-        color: var(--text-color);
         text-decoration: none;
         will-change: initial !important;
       }
@@ -317,52 +305,67 @@ var GaiaFastListProto = {
         will-change: transform !important;
       }
 
-      ::content .gfl-item .text {
-        flex: 1;
-        min-width: 0;
-      }
-
       ::content .gfl-item .image {
+        position: absolute;
+        right: 0; top: 0;
+
         width: 60px;
         height: 60px;
-        #background: var(--border-color);
-        -moz-margin-start: 17px;
+
+        background-color: var(--border-color);
+      }
+
+      ::content .image.round,
+      ::content .image.round > img {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
       }
 
       ::content .gfl-item .image.round {
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
-        overflow: hidden;
-      }
-
-      ::content .gfl-item .image > img {
-        width: 100%;
-        height: 100%;
+        top: 8.5px;
       }
 
       ::content .gfl-item img {
+        position: absolute;
+        left: 0; top: 0;
+
+        width: 60px;
+        height: 60px;
+
         opacity: 0;
+        will-change: opacity;
+      }
+
+      ::content h3,
+      ::content p {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
+      ::content .image ~ h3,
+      ::content .image ~ p {
+        padding-right: 60px;
+      }
+
+      ::content .image.round ~ h3,
+      ::content .image.round ~ p {
+        padding-right: 42px;
       }
 
       ::content h3 {
         margin: 0;
-        overflow: hidden;
 
         font-size: 20px;
         font-weight: 400;
-        white-space: nowrap;
-        text-overflow: ellipsis;
         color: var(--text-color);
-        background: var(--background);
       }
 
       ::content p {
         margin: 0;
         font-size: 15px;
         line-height: 1.35em;
-        color: var(--text-color-minus);
-        background: var(--background);
       }
 
       .picker {
@@ -389,7 +392,7 @@ var GaiaFastListProto = {
         flex: 1;
         text-decoration: none;
         text-align: center;
-        color: var(--text-color-minus);
+        color: inherit;
       }
 
       ::content [picker-item]:before {
@@ -405,7 +408,8 @@ var GaiaFastListProto = {
         text-decoration: none;
         text-align: center;
         font-size: 13px;
-        color: var(--text-color-minus);
+        color: inherit;
+
         text-transform: uppercase;
         -moz-user-select: none;
       }
@@ -419,15 +423,15 @@ var GaiaFastListProto = {
         width: 1.8em;
         height: 1.8em;
         margin: -1em 0 0 -1em;
-        overflow: hidden;
 
         font-size: 70px;
         text-align: center;
         line-height: 1.8;
         font-weight: 300;
         border-radius: 50%;
-        background: var(--background-minus);
+
         color: #fff;
+        background: var(--background-minus);
         pointer-events: none;
         opacity: 0;
         transition: opacity 400ms;
@@ -441,10 +445,6 @@ var GaiaFastListProto = {
       .overlay.visible {
         opacity: 1;
         transition: opacity 100ms;
-      }
-
-      .overlay > .text {
-
       }
 
       .overlay > .icon {
@@ -726,6 +726,7 @@ Internal.prototype = {
     debug('create item');
     this.parsedItem = this.parsedItem || poplar.parse(this.templateItem);
     var el = poplar.create(this.parsedItem.cloneNode(true));
+    el[keys.img] = el.querySelector('img');
     el.classList.add('gfl-item');
     return el;
   },
@@ -785,7 +786,7 @@ Internal.prototype = {
   populateItemDetail(el, i) {
     if (!this.getItemImageSrc) return;
 
-    var img = this.getItemImage(el);
+    var img = el[keys.img];
     if (!img) return;
 
     var record = this.getRecordAt(i);
@@ -798,6 +799,9 @@ Internal.prototype = {
         // Abort here if that's the case.
         if (el.dataset.index != i) return debug('item recycled');
 
+        // Abort if no src is returned
+        if (!src) return;
+
         img.src = src;
         img.onload = () => {
           img.style.transition = 'opacity 250ms';
@@ -808,14 +812,10 @@ Internal.prototype = {
 
   unpopulateItemDetail(el, i) {
     if (!this.getItemImageSrc) return;
-    var img = this.getItemImage(el);
-    img.removeAttribute('src');
+    var img = el[keys.img];
+    if (!img) return;
     img.style.transition = 'none';
     img.style.opacity = 0;
-  },
-
-  getItemImage(el) {
-    return el[keys.img] = (el[keys.img] || el.querySelector('img'));
   },
 
   /**

@@ -23,23 +23,13 @@ gaia-fast-list {
   bottom: 0;
   left: 0;
   right: 0;
+  overflow: hidden;
 }
 
-.circle {
-  width:45px;
-  height:45px;
-  border-radius:45px;
-  font-size:20px;
-  color:#fff;
-  line-height:45px;
-  text-align:center;
-  position: relative;
-}
-
-.over {
-  z-index:5;
-  position: absolute;
-  left: -17px;
-  top: 0px;
-  height:100%;
+.image {
+  line-height: 45px;
+  text-align: center;
+  font-family: Verdana;
+  font-size: 1.2rem;
+  font-color: #fff;
 }

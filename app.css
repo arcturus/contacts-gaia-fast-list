@@ -33,4 +33,13 @@ gaia-fast-list {
   color:#fff;
   line-height:45px;
   text-align:center;
+  position: relative;
+}
+
+.over {
+  z-index:5;
+  position: absolute;
+  left: -17px;
+  top: 0px;
+  height:100%;
 }

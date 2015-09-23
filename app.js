@@ -17,8 +17,17 @@
   generateColors();
 
   list.configure({
-    getSectionName: getSectionName
+    getSectionName: getSectionName,
+    getItemImageSrc: getImage
   });
+
+  function getImage(data, index) {
+    if (typeof data.image === 'string') {
+      return data.image;
+    }
+
+    return window.URL.createObjectURL(data.image);
+  }
 
   function getSectionName(item) {
     return item.title[0].toLowerCase();
@@ -109,6 +118,13 @@
         };
         index++;
         row.initials = getInitials(row.title);
+        if (Array.isArray(contact.photo) && contact.photo.length > 0) {
+          console.log('------> we have image ' + contact.photo);
+          row.image = contact.photo[contact.photo.length > 1 ? 1: 0];
+        } else {
+          console.log('-----> no image for us');
+          row.image = '/img/1x1.png';
+        }
         buffer.push(row);
         if (firstChunkReady && index % CHUNK === 0) {
           // Append a chunk

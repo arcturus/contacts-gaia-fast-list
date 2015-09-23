@@ -31,7 +31,10 @@ var debug = 0 ? (...args) => console.log('[GaiaFastList]', ...args) : () => {};
  *
  * @type {Symbol}
  */
-var internal = Symbol();
+var keys = {
+  internal: Symbol(),
+  img: Symbol()
+};
 
 /**
  * Public prototype.
@@ -56,7 +59,7 @@ var GaiaFastListProto = {
     this.bottom = this.getAttribute('bottom');
     this.top = this.getAttribute('top');
 
-    this[internal] = new Internal(this);
+    this[keys.internal] = new Internal(this);
     debug('created');
   },
 
@@ -72,7 +75,7 @@ var GaiaFastListProto = {
    */
   configure(props) {
     debug('configure');
-    this[internal].configure(props);
+    this[keys.internal].configure(props);
   },
 
   /**
@@ -92,8 +95,8 @@ var GaiaFastListProto = {
   complete() {
     if (!this.caching) return;
     debug('complete');
-    this[internal].cachedHeight = null;
-    this[internal].updateCachedHeight();
+    this[keys.internal].cachedHeight = null;
+    this[keys.internal].updateCachedHeight();
   },
 
   /**
@@ -103,7 +106,7 @@ var GaiaFastListProto = {
    */
   clearCache() {
     debug('clear cache');
-    this[internal].clearCache();
+    this[keys.internal].clearCache();
   },
 
   /**
@@ -112,7 +115,7 @@ var GaiaFastListProto = {
    * @public
    */
   destroy() {
-    this[internal].destroy();
+    this[keys.internal].destroy();
   },
 
   /**
@@ -123,8 +126,8 @@ var GaiaFastListProto = {
    */
   attrs: {
     model: {
-      get() { return this[internal].model; },
-      set(value) { this[internal].setModel(value); }
+      get() { return this[keys.internal].model; },
+      set(value) { this[keys.internal].setModel(value); }
     },
 
     top: {
@@ -173,17 +176,17 @@ var GaiaFastListProto = {
     },
 
     scrollTop: {
-      get() { return this[internal].fastList.scrollTop; },
+      get() { return this[keys.internal].fastList.scrollTop; },
       set(value) {
-        var fastList = this[internal].fastList;
+        var fastList = this[keys.internal].fastList;
         if (fastList) fastList.scrollInstantly(value);
-        else this[internal].initialScrollTop = value;
+        else this[keys.internal].initialScrollTop = value;
       }
     },
 
     minScrollHeight: {
-      get() { return this[internal].list.style.minHeight; },
-      set(value) { this[internal].list.style.minHeight = value; }
+      get() { return this[keys.internal].list.style.minHeight; },
+      set(value) { this[keys.internal].list.style.minHeight = value; }
     },
 
     picker: {
@@ -322,7 +325,7 @@ var GaiaFastListProto = {
       ::content .gfl-item .image {
         width: 60px;
         height: 60px;
-        background: var(--border-color);
+        #background: var(--border-color);
         -moz-margin-start: 17px;
       }
 
@@ -336,6 +339,10 @@ var GaiaFastListProto = {
       ::content .gfl-item .image > img {
         width: 100%;
         height: 100%;
+      }
+
+      ::content .gfl-item img {
+        opacity: 0;
       }
 
       ::content h3 {
@@ -610,6 +617,8 @@ Internal.prototype = {
     var sectioned = !!this.getSectionName;
     var hash = {};
 
+    this.hasSections = false;
+
     for (var i = 0, l = items.length; i < l; i++) {
       var item = items[i];
       var section = sectioned && this.getSectionName(item);
@@ -637,6 +646,7 @@ Internal.prototype = {
       }
 
       hash[section].push(item);
+      this.hasSections = true;
     }
 
     return sectioned && hash;
@@ -772,6 +782,42 @@ Internal.prototype = {
       : '0';
   },
 
+  populateItemDetail(el, i) {
+    if (!this.getItemImageSrc) return;
+
+    var img = this.getItemImage(el);
+    if (!img) return;
+
+    var record = this.getRecordAt(i);
+    Promise.resolve(this.getItemImageSrc(record, i))
+      .then(src => {
+
+        // There is a chance that the item
+        // could have been recycled before
+        // the user was able to fetch the image.
+        // Abort here if that's the case.
+        if (el.dataset.index != i) return debug('item recycled');
+
+        img.src = src;
+        img.onload = () => {
+          img.style.transition = 'opacity 250ms';
+          img.style.opacity = 1;
+        };
+      });
+  },
+
+  unpopulateItemDetail(el, i) {
+    if (!this.getItemImageSrc) return;
+    var img = this.getItemImage(el);
+    img.removeAttribute('src');
+    img.style.transition = 'none';
+    img.style.opacity = 0;
+  },
+
+  getItemImage(el) {
+    return el[keys.img] = (el[keys.img] || el.querySelector('img'));
+  },
+
   /**
    * Called by FastList when it needs
    * to populate a section with content.
@@ -813,12 +859,8 @@ Internal.prototype = {
     return Object.keys(this.sections || {});
   },
 
-  hasSections() {
-    return !!this.getSections().length;
-  },
-
   getSectionHeaderHeight() {
-    return this.hasSections() ? this.headerHeight : 0;
+    return this.hasSections ? this.headerHeight : 0;
   },
 
   getFullSectionHeight(key) {
@@ -899,20 +941,21 @@ Internal.prototype = {
     // debug('get position for index', index);
     var sections = this.sections || [this.model];
     var headerHeight = this.getSectionHeaderHeight();
-    var itemHeight = this.getItemHeight();
+    var itemHeight = this.itemHeight;
     var top = this.el.offset;
+    var length;
 
     for (var name in sections) {
-      var items = sections[name];
+      length = sections[name].length;
       top += headerHeight;
 
-      if (index < items.length) {
+      if (index < length) {
         top += index * itemHeight;
         break;
       }
 
-      index -= items.length;
-      top += items.length * itemHeight;
+      index -= length;
+      top += length * itemHeight;
     }
 
     // debug('got position', top);

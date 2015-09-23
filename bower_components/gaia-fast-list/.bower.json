@@ -33,14 +33,13 @@
     "gaia-theme": "gaia-components/gaia-theme#~0.5.1",
     "test-utils": "gaia-components/test-utils#~0.0.4"
   },
-  "_release": "6095fc7193",
+  "_release": "2ebb7853e3",
   "_resolution": {
     "type": "branch",
-    "branch": "master",
-    "commit": "6095fc7193e21994a7b5230af581ab58db4ad818"
+    "branch": "7-images",
+    "commit": "2ebb7853e3b5442067cfedb8c0640b0ec76eb78b"
   },
-  "_source": "git://github.com/gaia-components/gaia-fast-list.git",
-  "_target": "*",
-  "_originalSource": "gaia-components/gaia-fast-list",
-  "_direct": true
+  "_source": "https://github.com/wilsonpage/gaia-fast-list.git",
+  "_target": "7-images",
+  "_originalSource": "https://github.com/wilsonpage/gaia-fast-list.git"
 }

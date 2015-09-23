@@ -1,0 +1,30 @@
+{
+  "name": "contacts-fast-list",
+  "version": "0.0.0",
+  "homepage": "https://github.com/arcturus/contacts-gaia-fast-list",
+  "authors": [
+    "Francisco Jordano <fjordano@mozilla.com>"
+  ],
+  "description": "Fast contacts list",
+  "main": "index.html",
+  "keywords": [
+    "contacts",
+    "gaia-fast-list",
+    "gaia"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "base": "gaia-components/base",
+    "gaia-fast-list": "gaia-components/gaia-fast-list",
+    "gaia-fonts": "gaia-components/gaia-fonts#~0.2.1",
+    "gaia-header": "gaia-components/gaia-header#~0.8.4",
+    "gaia-theme": "gaia-components/gaia-theme#~0.5.1"
+  }
+}

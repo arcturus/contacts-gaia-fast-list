@@ -3,6 +3,18 @@
 (function(exports) {
 
   var list = document.querySelector('gaia-fast-list');
+  var colors = [];
+
+  function generateColors() {
+    for(var i = 0; i < 20; i++) {
+      var red = parseInt(Math.random() * 128);
+      var green = parseInt(Math.random() * 128);
+      var blue = parseInt(Math.random() * 128);
+
+      colors.push('rgb(' + red + ', ' + green + ', ' + blue + ')')
+    }
+  }
+  generateColors();
 
   list.configure({
     getSectionName: getSectionName
@@ -63,6 +75,15 @@
     return '';
   }
 
+  function getInitials(rowTitle) {
+    var result = rowTitle[0].toUpperCase();
+    var split = rowTitle.split(' ');
+    if (split.length > 1 && split[1].length > 0) {
+      result += split[1][0].toUpperCase();
+    }
+    return result;
+  }
+
   function fetchAllContacts() {
     var options = {
       sortBy: 'givenName',
@@ -81,11 +102,14 @@
     cursor.onsuccess = function onsuccess(evt) {
       var contact = evt.target.result;
       if (contact) {
-        index++;
-        buffer.push({
+        var row = {
           title: getRowTitle(contact) || 'No name',
-          org: getOrg(contact)
-        });
+          org: getOrg(contact),
+          background: colors[index % colors.length]
+        };
+        index++;
+        row.initials = getInitials(row.title);
+        buffer.push(row);
         if (firstChunkReady && index % CHUNK === 0) {
           // Append a chunk
           appendToList(buffer);

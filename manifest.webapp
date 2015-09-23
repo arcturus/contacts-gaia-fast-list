@@ -10,7 +10,8 @@
     "contacts":{
       "description": "Contacts permissions is required",
       "access": "readwrite"
-    }
+    },
+    "moz-extremely-unstable-and-will-change-webcomponents": {}
   },
   "default_locale": "en-US",
   "icons": {

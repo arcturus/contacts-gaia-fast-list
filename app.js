@@ -32,8 +32,8 @@
   });
 
   function getImage(data, index) {
-    if (typeof data.image === 'string') {
-      return data.image;
+    if (data.image === null) {
+      return null;
     }
 
     return window.URL.createObjectURL(data.image);
@@ -132,8 +132,7 @@
         if (Array.isArray(contact.photo) && contact.photo.length > 0) {
           row.image = contact.photo[contact.photo.length > 1 ? 1: 0];
         } else {
-          console.log('-----> no image for us');
-          row.image = '/img/1x1.png';
+          row.image = null;
         }
         buffer.push(row);
         if (firstChunkReady && index % CHUNK === 0) {

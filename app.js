@@ -3,18 +3,21 @@
 (function(exports) {
 
   var list = document.querySelector('gaia-fast-list');
-  var colors = [];
 
-  function generateColors() {
-    for(var i = 0; i < 20; i++) {
-      var red = parseInt(Math.random() * 128);
-      var green = parseInt(Math.random() * 128);
-      var blue = parseInt(Math.random() * 128);
-
-      colors.push('rgb(' + red + ', ' + green + ', ' + blue + ')')
+  var stringToColour = function(str) {
+    var base = [82, 186, 209];
+    var hash = 0;
+    for (var i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
     }
+    var colour = '#';
+    for (var i = 0; i < 3; i++) {
+        var value = (hash >> (i * 8)) & 0xFF;
+        value = parseInt((value + base[i])/ 2);
+        colour += ('00' + value.toString(16)).substr(-2);
+    }
+    return colour;
   }
-  generateColors();
 
   list.configure({
     getSectionName: getSectionName,
@@ -121,11 +124,12 @@
     cursor.onsuccess = function onsuccess(evt) {
       var contact = evt.target.result;
       if (contact) {
+        var rowTitle = getRowTitle(contact) || 'No name';
         var row = {
           id: contact.id,
-          title: getRowTitle(contact) || 'No name',
+          title: rowTitle,
           org: getOrg(contact),
-          background: colors[index % colors.length]
+          background: stringToColour(rowTitle)
         };
         index++;
         row.initials = getInitials(row.title);
